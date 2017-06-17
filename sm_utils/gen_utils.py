@@ -6,6 +6,8 @@ import codecs, random, pickle, hashlib
 import gensim
 import nlp_utils
 
+check_dir = '/home/smysore/browsing_legislations/check_dir'
+
 def read_dir(input_dir, num_files=None):
     dir_text_td = list()
     fcount = 0
@@ -14,6 +16,7 @@ def read_dir(input_dir, num_files=None):
     if num_files is None:
         num_files = len(flist)
     
+    map_writer = codecs.open(os.path.join(check_dir, 'fname_sha1_map.pd'), "w", "utf-8")
     file_hash_map = dict()
     random.shuffle(flist)
     for filename in flist:
@@ -28,16 +31,9 @@ def read_dir(input_dir, num_files=None):
                 doc_str = u' '.join(cleaned_doc_tok).encode('utf-8').strip()
                 doc_sha1 = hashlib.sha1(doc_str).hexdigest()
 
+                map_writer.write("{}\t{}".format(cur_fname, doc_sha1))
+
                 # Create gensim tagged document.
                 doc_td = gensim.models.doc2vec.TaggedDocument(cleaned_doc_tok, doc_sha1)
-                file_hash_map[cur_fname] = doc_sha1
-                dir_text_td.append(doc_td)
-                fcount += 1
-
-    print('Read {} documents'.format(fcount))
+                yield doc_td
     
-    # Write maps of sha1 hash to document file name to disk.
-    with open('fname_sha1_map.pd', 'wb') as h:
-        pickle.dump(file_hash_map, h)
-
-    return dir_text_td
