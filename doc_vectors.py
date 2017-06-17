@@ -22,7 +22,7 @@ def main():
 
 	# Actually train vectors.
 	model.train(train_corpus_td, total_examples=model.corpus_count, epochs=model.iter)
-	model.save(os.path.join(check_dir, 'model.doc2vec'))
+	model.save(os.path.join(check_dir, 'model-large.doc2vec'))
 
 if __name__ == '__main__':
 	main()
